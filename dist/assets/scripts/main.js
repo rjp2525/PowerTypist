@@ -71,34 +71,46 @@ function type() {
   var typeController = function() {
     var vm = this;
 
-    vm.message = 'hi';
+    var shuffleArray = function(array) {
+      var m = array.length, t, i;
+
+      while (m) {
+        i = Math.floor(Math.random() * m--);
+
+        t = array[m];
+        array[m] = array[i];
+        array[i] = t;
+      }
+
+      return array;
+    }
 
     vm.wordBank = [
-      'hello', 'this', 'is', 'an', 'example', 'but',
-      'who', 'what', 'they', 'he', 'her', 'their',
-      'there', 'when', 'American', 'truck',
-      'how', 'often', 'did', 'word', 'come',
-      'up'
+      'hi', 'bye', 'this', 'he', 'were', 'who',
+      'they', 'example', 'how', 'for', 'Indian',
+      'American', 'truck', 'but', 'spin', 'hoop',
+      'basketball', 'alcohol'
     ];
 
+    vm.wordBank = shuffleArray(vm.wordBank);
+
     vm.onWord = 0;
-    vm.correctWords = [0];
+    
+    vm.correctWords = [];
+    vm.incorrectWords = [];
 
     vm.checkWord = function(event) {
       if (event.keyCode === 32 || event.charCode === 32) {
         event.preventDefault();
 
         if ($('input').val() == vm.wordBank[vm.onWord]) {
-          vm.wordBank[vm.onWord] = 'CORRECT';
+          vm.correctWords.push(vm.onWord);
         } else {
-          vm.wordBank[vm.onWord] = 'ERROR';
+          vm.incorrectWords.push(vm.onWord);
         }
 
         $('input').val('');
-        vm.correctWords.push(vm.wordOn);
         vm.onWord += 1;
-        vm.wordBank = vm.wordBank;
-        console.log(vm.onWord);
       }
     }
   }
