@@ -1,0 +1,14 @@
+<div class="container" style="padding-top:75px;">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <span style="display:inline;" ng-repeat="word in vm.wordBank track by $index">
+            <span ng-class="{'color-green': vm.correctWords.indexOf($index) > -1}">{{ word }}
+          </span>
+        </div>
+      </div>
+      <input type="text" ng-keypress="vm.checkWord($event)" class="form-control">
+    </div>
+  </div>
+</div>
