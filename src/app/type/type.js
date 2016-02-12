@@ -10,7 +10,7 @@ function type() {
       });
   }
 
-  var typeController = function() {
+  var typeController = function($timeout) {
     var vm = this;
 
     var shuffleArray = function(array) {
@@ -36,10 +36,37 @@ function type() {
 
     vm.wordBank = shuffleArray(vm.wordBank);
 
+    if (vm.wordBank.length < 120) {
+      for (var i = 0; i < 120; i ++) {
+        vm.wordBank.push(vm.wordBank[i]);
+      }
+
+      shuffleArray(vm.wordBank);
+    }
+
     vm.onWord = 0;
-    
+
     vm.correctWords = [];
     vm.incorrectWords = [];
+
+    vm.wordsPerMinute = 0;
+
+    vm.counter = 60;
+
+    function endGame() {
+      vm.wordsPerMinute = vm.correctWords.length;
+    }
+
+    vm.timer = function() {
+      if (vm.counter != 0) {
+        vm.counter --;
+        timeout = $timeout(vm.timer, 1000);
+      } else {
+        endGame();
+      }
+    }
+
+    var timeout = $timeout(vm.timer, 1000);
 
     vm.checkWord = function(event) {
       if (event.keyCode === 32 || event.charCode === 32) {
@@ -55,6 +82,18 @@ function type() {
         vm.onWord += 1;
       }
     }
+
+    vm.refresh = function() {
+      vm.onWord = 0;
+      vm.correctWords = [];
+      vm.incorrectWords = [];
+      vm.counter = 60;
+      vm.wordsPerMinute = 0;
+
+      $('input').val('');
+      $('input').focus();
+      vm.wordBank = shuffleArray(vm.wordBank);
+    }
   }
 
   angular
@@ -64,6 +103,7 @@ function type() {
       config
     ])
     .controller('TypeController', [
+      '$timeout',
       typeController
     ]);
 }

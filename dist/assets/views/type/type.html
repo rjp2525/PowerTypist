@@ -11,8 +11,18 @@
       <div class="input-group">
         <input type="text" ng-keypress="vm.checkWord($event)" class="form-control">
         <span class="input-group-btn">
-          <button class="btn btn-default" type="button"><i class="fa fa-fw fa-refresh"></i></button>
+          <button class="btn btn-default" type="button" ng-click="vm.refresh()"><i class="fa fa-fw fa-refresh"></i></button>
         </span>
+      </div>
+    </div>
+    <div class="col-md-6" style="margin-top:20px;">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <b>{{ vm.wordsPerMinute }}</b> Word Per Minute<br>
+          {{ vm.counter }} <br>
+          <span class="color-green">{{ vm.correctWords.length }} correct words.</span><br>
+          <span class="color-red">{{ vm.incorrectWords.length }} incorrect words.</span>
+        </div>
       </div>
     </div>
   </div>
