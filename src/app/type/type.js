@@ -6,48 +6,36 @@ function type() {
         url: '/type',
         controller: 'TypeController',
         controllerAs: 'vm',
-        templateUrl: './dist/assets/views/type/type.html'
+        templateUrl: './dist/assets/views/type/type.html',
+        resolve: {
+          words: [
+            'WordsService',
+            function(WordsService) {
+              return WordsService.index()
+              .then(function(response) {
+                return response;
+              });
+            }
+          ]
+        }
       });
   }
 
-  var typeController = function($timeout) {
+  var typeController = function(words, WordsService, $timeout) {
     var vm = this;
 
-    var shuffleArray = function(array) {
-      var m = array.length, t, i;
+    vm.wordBank = words;
 
-      while (m) {
-        i = Math.floor(Math.random() * m--);
-
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
-      }
-
-      return array;
-    }
-
-    vm.wordBank = [
-      'hi', 'bye', 'this', 'he', 'were', 'who',
-      'they', 'example', 'how', 'for', 'Indian',
-      'American', 'truck', 'but', 'spin', 'hoop',
-      'basketball', 'alcohol'
-    ];
-
-    vm.wordBank = shuffleArray(vm.wordBank);
-
-    if (vm.wordBank.length < 120) {
-      for (var i = 0; i < 120; i ++) {
-        vm.wordBank.push(vm.wordBank[i]);
-      }
-
-      shuffleArray(vm.wordBank);
+    if (vm.wordBank.length <= 100) {
+      vm.wordBank = WordsService.extend(vm.wordBank, 200);
     }
 
     vm.onWord = 0;
 
     vm.correctWords = [];
     vm.incorrectWords = [];
+    vm.correctChars = 0;
+    vm.incorrectChars = 0;
 
     vm.wordsPerMinute = 0;
 
@@ -80,6 +68,12 @@ function type() {
 
         $('input').val('');
         vm.onWord += 1;
+      } else {
+        if ($('input').val() == vm.wordBank[vm.onWord].substring(0, $('input').val().length)) {
+          vm.correctChars += 1;
+        } else {
+          vm.incorrectChars += 1;
+        }
       }
     }
 
@@ -89,10 +83,11 @@ function type() {
       vm.incorrectWords = [];
       vm.counter = 60;
       vm.wordsPerMinute = 0;
+      vm.timer;
 
       $('input').val('');
       $('input').focus();
-      vm.wordBank = shuffleArray(vm.wordBank);
+      vm.wordBank = WordsService.refresh(vm.wordBank);
     }
   }
 
@@ -103,6 +98,8 @@ function type() {
       config
     ])
     .controller('TypeController', [
+      'words',
+      'WordsService',
       '$timeout',
       typeController
     ]);

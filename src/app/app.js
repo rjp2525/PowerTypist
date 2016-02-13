@@ -22,3 +22,5 @@ angular
     '$stateProvider',
     config
   ]);
+
+var words = require('./services/words.js');
