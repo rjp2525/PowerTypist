@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="input-group">
-        <input type="text" ng-keypress="vm.checkWord($event)" class="form-control">
+        <input type="text" ng-keydown="vm.checkWord($event)" ng-keyup="vm.checkChar($event)" class="form-control">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button" ng-click="vm.refresh()"><i class="fa fa-fw fa-refresh"></i></button>
         </span>
@@ -20,6 +20,7 @@
         <div class="panel-body">
           <b>{{ vm.wordsPerMinute }}</b> Word Per Minute<br>
           {{ vm.counter }} <br>
+          <span>On char: {{ vm.onChar }}</span><br>
           <span class="color-green">{{ vm.correctWords.length }} correct words.</span><br>
           <span class="color-red">{{ vm.incorrectWords.length }} incorrect words.</span><br>
           <span class="color-green">{{ vm.correctChars }} correct characters.</span><br>

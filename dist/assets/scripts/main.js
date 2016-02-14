@@ -153,6 +153,7 @@ function type() {
     }
 
     vm.onWord = 0;
+    vm.onChar = 0;
 
     vm.correctWords = [];
     vm.incorrectWords = [];
@@ -182,19 +183,30 @@ function type() {
       if (event.keyCode === 32 || event.charCode === 32) {
         event.preventDefault();
 
-        if ($('input').val() == vm.wordBank[vm.onWord]) {
+        if ($('input').val() == vm.wordBank[vm.onWord].substring(0, vm.wordBank[vm.onWord].length)) {
           vm.correctWords.push(vm.onWord);
         } else {
           vm.incorrectWords.push(vm.onWord);
         }
 
+        console.log($('input').val());
+
         $('input').val('');
         vm.onWord += 1;
-      } else {
+
+      }
+
+      vm.onChar ++;
+    }
+
+    vm.checkChar = function(event) {
+      if (event.keyCode != 32 && event.charCode != 32) {
         if ($('input').val() == vm.wordBank[vm.onWord].substring(0, $('input').val().length)) {
           vm.correctChars += 1;
+          $('input').css("background", "white");
         } else {
           vm.incorrectChars += 1;
+          $('input').css("background", "red");
         }
       }
     }
