@@ -1,7 +1,7 @@
 <div class="container" style="margin-top:15px;">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-      <div class="panel panel-default">
+      <div class="panel panel-words panel-default">
         <div class="panel-body">
           <span style="display:inline;" ng-repeat="word in vm.wordBank track by $index">
             <span ng-class="{'color-green': vm.correctWords.indexOf($index) > -1, 'color-red': vm.incorrectWords.indexOf($index) > -1, 'word-active': vm.onWord == $index}" style="padding:5px;">{{ word }}</span>
