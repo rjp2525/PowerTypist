@@ -30,6 +30,8 @@ function type() {
       vm.wordBank = WordsService.extend(vm.wordBank, 200);
     }
 
+    var currentHeight = 0;
+
     vm.onWord = 0;
     vm.onChar = 0;
 
@@ -52,6 +54,13 @@ function type() {
       $('.panel-words').slideUp();
     }
 
+    function checkWPM() {
+      var secondsPassed = 60 - vm.counter;
+      var rate = 60 / secondsPassed;
+
+      vm.wordsPerMinute = Math.round(vm.correctWords.length * rate);
+    }
+
     function onTimeout() {
       if (vm.counter == 0) {
         $timeout.cancel(timeout);
@@ -62,6 +71,7 @@ function type() {
 
         vm.counter -= 1;
         timer = true;
+        checkWPM();
         timeout = $timeout(onTimeout, 1000);
       }
     }
@@ -81,13 +91,21 @@ function type() {
       if (event.keyCode === 32 || event.charCode === 32) {
         event.preventDefault();
 
+        var currentWord = $('.word-active').position().top;
+        var nextWord = $('.word-next').position().top;
+
+        if (currentWord < nextWord) {
+          var top = $('.word-list').position().top;
+          $('.word-list').css('top', top - 45 + 'px');
+        }
+
+        console.log(currentWord);
+
         if ($('input').val() == vm.wordBank[vm.onWord].substring(0, vm.wordBank[vm.onWord].length)) {
           vm.correctWords.push(vm.onWord);
         } else {
           vm.incorrectWords.push(vm.onWord);
         }
-
-        console.log($('input').val());
 
         $('input').val('');
         vm.onWord += 1;
@@ -128,6 +146,7 @@ function type() {
       $('input').removeAttr('disabled');
       $('input').val('');
       $('input').focus();
+      $('.word-list').css('top', '5px');
       vm.wordBank = WordsService.refresh(vm.wordBank);
       $('.panel-words').slideDown();
     }

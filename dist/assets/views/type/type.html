@@ -2,10 +2,12 @@
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <div class="panel panel-words panel-default">
-        <div class="panel-body">
-          <span style="display:inline;" ng-repeat="word in vm.wordBank track by $index">
-            <span ng-class="{'color-green': vm.correctWords.indexOf($index) > -1, 'color-red': vm.incorrectWords.indexOf($index) > -1, 'word-active': vm.onWord == $index}" style="padding:5px;">{{ word }}</span>
-          </span>
+        <div class="panel-body" style="height:95px;overflow:hidden;position:relative;">
+          <div class="word-list" style="position:absolute;top:5px;bottom:0;font-size:32px;">
+            <span style="display:inline;" ng-repeat="word in vm.wordBank track by $index">
+              <span ng-class="{'color-green': vm.correctWords.indexOf($index) > -1, 'color-red': vm.incorrectWords.indexOf($index) > -1, 'word-active': vm.onWord == $index, 'word-next': vm.onWord + 1 == $index}" style="padding:5px;" class="word" value="{{ $index }}">{{ word }}</span>
+            </span>
+          </div>
         </div>
       </div>
       <div class="input-group">
@@ -20,6 +22,7 @@
         <div class="panel-body">
           <b>{{ vm.wordsPerMinute }}</b> Word Per Minute<br>
           {{ vm.counter }} <br>
+          {{ vm.secondsPassed }} seconds passed. <br>
           <span>On char: {{ vm.onChar }}</span><br>
           <span class="color-green">{{ vm.correctWords.length }} correct words.</span><br>
           <span class="color-red">{{ vm.incorrectWords.length }} incorrect words.</span><br>
