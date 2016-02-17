@@ -21,7 +21,7 @@ function type() {
       });
   }
 
-  var typeController = function(words, WordsService, $timeout) {
+  var typeController = function(words, WordsService, $timeout, ScoresService) {
     var vm = this;
 
     vm.wordBank = words;
@@ -45,13 +45,15 @@ function type() {
     vm.counter = 60;
     var timeout = null;
 
+    vm.gameOver = false;
+
     var timer = false;
 
     function endGame() {
       vm.wordsPerMinute = vm.correctWords.length;
-      $('input').css('background', '#eee');
-      $('input').attr('disabled', '');
+      $('.input-group').hide();
       $('.panel-words').slideUp();
+      vm.gameOver = true;
     }
 
     function checkWPM() {
@@ -141,6 +143,7 @@ function type() {
       vm.counter = 60;
       stopTimer();
       vm.wordsPerMinute = 0;
+      vm.gameOver = false;
 
       $('input').css('background', 'white')
       $('input').removeAttr('disabled');
@@ -149,6 +152,20 @@ function type() {
       $('.word-list').css('top', '5px');
       vm.wordBank = WordsService.refresh(vm.wordBank);
       $('.panel-words').slideDown();
+    }
+
+    vm.store = function() {
+      var data = {name: vm.name, wpm: vm.wordsPerMinute};
+      console.log(data);
+
+      ScoresService.store(data)
+        .then(function(response) {
+          console.log(response);
+          if (response.success) {
+            console.log(response.data);
+            vm.gameOver = false;
+          }
+        });
     }
 
     $(document).on('keydown', function(event) {
@@ -168,6 +185,7 @@ function type() {
       'words',
       'WordsService',
       '$timeout',
+      'ScoresService',
       typeController
     ]);
 }

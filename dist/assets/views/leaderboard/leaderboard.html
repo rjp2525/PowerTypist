@@ -1,0 +1,24 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<div class="page-header">
+				<h4>Leaderboard</h4>
+			</div>
+			<div class="row">
+				<div ng-if="vm.leaderboard.length <= 0" class="col-md-12">
+					<div class="alert alert-danger">
+						<strong>Whoops!</strong> No typists could be found. Click <a ui-sref="type">here</a> to go get one for yourself!
+					</div>
+				</div>
+				<div ng-if="vm.leaderboard.length > 0" ng-repeat="score in vm.leaderboard | orderBy : 'wpm'">
+					<div class="col-xs-6">
+						{{ score.name }}
+					</div>
+					<div class="col-xs-6 text-right">
+						{{ score.wpm }} WPM
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

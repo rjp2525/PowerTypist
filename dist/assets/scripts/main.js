@@ -1,6 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var home = require('./home/home.js'),
-    type = require('./type/type.js');
+var home        = require('./home/home'),
+    type        = require('./type/type'),
+    leaderboard = require('./leaderboard/leaderboard');
 
 var config = function($urlRouterProvider, $stateProvider) {
   $stateProvider
@@ -16,7 +17,8 @@ var config = function($urlRouterProvider, $stateProvider) {
 angular
   .module('PowerTypist', [
     'Home',
-    'Type'
+    'Type',
+    'Leaderboard'
   ])
   .config([
     '$urlRouterProvider',
@@ -24,9 +26,10 @@ angular
     config
   ]);
 
-var words = require('./services/words.js');
+var words  = require('./services/words.js');
+var scores = require('./services/scores.js');
 
-},{"./home/home.js":2,"./services/words.js":3,"./type/type.js":4}],2:[function(require,module,exports){
+},{"./home/home":2,"./leaderboard/leaderboard":3,"./services/scores.js":4,"./services/words.js":5,"./type/type":6}],2:[function(require,module,exports){
 function home() {
 
   var config = function($stateProvider) {
@@ -58,6 +61,92 @@ function home() {
 module.exports = home();
 
 },{}],3:[function(require,module,exports){
+function leaderboard() {
+ 	var config = function($stateProvider) {
+ 		$stateProvider
+ 			.state('leaderboard', {
+ 				url: '/leaderboard',
+ 				controller: 'LeaderboardController',
+ 				controllerAs: 'vm',
+ 				templateUrl: './dist/assets/views/leaderboard/leaderboard.html',
+ 				resolve: {
+ 					leaderboard: [
+ 						'ScoresService',
+ 						function(ScoresService) {
+ 							return ScoresService.index()
+ 							.then(function(response) {
+ 								return response;
+ 							});
+ 						}
+ 					]
+ 				}
+ 			});
+ 	}
+
+ 	var leaderboardController = function(leaderboard) {
+ 		var vm = this;
+ 		vm.leaderboard = leaderboard;
+ 	}
+
+ 	angular
+ 		.module('Leaderboard', ['ui.router'])
+ 		.config([
+ 			'$stateProvider',
+ 			config
+ 		])
+ 		.controller('LeaderboardController', [
+ 			'leaderboard',
+ 			leaderboardController
+ 		]);
+}
+
+module.exports = leaderboard();
+},{}],4:[function(require,module,exports){
+function scores() {
+	var ScoresService = function($q, $http) {
+		var ScoresService = {};
+		var API = 'http://45.63.18.172:8080/';
+
+		ScoresService.index = function() {
+			var defer = $q.defer();
+
+			$http.get(API + 'scores')
+				.then(function(response) {
+					return defer.resolve(response.data);
+				}, function(response) {
+					return defer.reject('Whoops! Something went wrong!');
+				});
+
+			return defer.promise;
+		}
+
+		ScoresService.store = function(data) {
+			var defer = $q.defer();
+
+			$http.post(API + 'scores', data)
+				.then(function(response) {
+					return defer.resolve(response.data);
+				}, function(response) {
+					return defer.reject('Whoops! Something went wrong!');
+				});
+
+			return defer.promise;
+		}
+
+		return ScoresService;
+	}
+
+	angular
+		.module('PowerTypist')
+		.factory('ScoresService', [
+			'$q',
+			'$http',
+			ScoresService
+		]);
+}
+
+module.exports = scores();
+},{}],5:[function(require,module,exports){
 function words() {
 	var WordsService = function($q, $http) {
 		var WordsService = {};
@@ -119,7 +208,7 @@ function words() {
 }
 
 module.exports = words();
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 function type() {
 
   var config = function($stateProvider) {
@@ -143,7 +232,7 @@ function type() {
       });
   }
 
-  var typeController = function(words, WordsService, $timeout) {
+  var typeController = function(words, WordsService, $timeout, ScoresService) {
     var vm = this;
 
     vm.wordBank = words;
@@ -167,13 +256,15 @@ function type() {
     vm.counter = 60;
     var timeout = null;
 
+    vm.gameOver = false;
+
     var timer = false;
 
     function endGame() {
       vm.wordsPerMinute = vm.correctWords.length;
-      $('input').css('background', '#eee');
-      $('input').attr('disabled', '');
+      $('.input-group').hide();
       $('.panel-words').slideUp();
+      vm.gameOver = true;
     }
 
     function checkWPM() {
@@ -263,6 +354,7 @@ function type() {
       vm.counter = 60;
       stopTimer();
       vm.wordsPerMinute = 0;
+      vm.gameOver = false;
 
       $('input').css('background', 'white')
       $('input').removeAttr('disabled');
@@ -271,6 +363,20 @@ function type() {
       $('.word-list').css('top', '5px');
       vm.wordBank = WordsService.refresh(vm.wordBank);
       $('.panel-words').slideDown();
+    }
+
+    vm.store = function() {
+      var data = {name: vm.name, wpm: vm.wordsPerMinute};
+      console.log(data);
+
+      ScoresService.store(data)
+        .then(function(response) {
+          console.log(response);
+          if (response.success) {
+            console.log(response.data);
+            vm.gameOver = false;
+          }
+        });
     }
 
     $(document).on('keydown', function(event) {
@@ -290,6 +396,7 @@ function type() {
       'words',
       'WordsService',
       '$timeout',
+      'ScoresService',
       typeController
     ]);
 }

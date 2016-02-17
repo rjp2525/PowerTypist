@@ -1,5 +1,6 @@
-var home = require('./home/home.js'),
-    type = require('./type/type.js');
+var home        = require('./home/home'),
+    type        = require('./type/type'),
+    leaderboard = require('./leaderboard/leaderboard');
 
 var config = function($urlRouterProvider, $stateProvider) {
   $stateProvider
@@ -15,7 +16,8 @@ var config = function($urlRouterProvider, $stateProvider) {
 angular
   .module('PowerTypist', [
     'Home',
-    'Type'
+    'Type',
+    'Leaderboard'
   ])
   .config([
     '$urlRouterProvider',
@@ -23,4 +25,5 @@ angular
     config
   ]);
 
-var words = require('./services/words.js');
+var words  = require('./services/words.js');
+var scores = require('./services/scores.js');
