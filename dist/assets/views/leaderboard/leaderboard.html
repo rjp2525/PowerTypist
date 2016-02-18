@@ -10,13 +10,13 @@
 						<strong>Whoops!</strong> No typists could be found. Click <a ui-sref="type">here</a> to go get one for yourself!
 					</div>
 				</div>
-				<div ng-if="vm.leaderboard.length > 0" ng-repeat="score in vm.leaderboard | orderBy : '-wpm' | limitTo: 50 track by $index">
+				<div ng-repeat="score in vm.leaderboard | orderBy : '-wpm' | limitTo: 50 track by $index" ng-if="vm.leaderboard.length > 0 && score.wpm < 300">
 					<div class="col-xs-6">
 						<b>{{ $index + 1 }}.</b>
 						<span ng-if="score.name == undefined">
 							Anonymous
 						</span>
-						{{ score.name }}
+						{{ score.name.substring(0, 30) }}
 					</div>
 					<div class="col-xs-6 text-right">
 						{{ score.wpm }} WPM
