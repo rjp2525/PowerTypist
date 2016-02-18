@@ -10,7 +10,7 @@
 						<strong>Whoops!</strong> No typists could be found. Click <a ui-sref="type">here</a> to go get one for yourself!
 					</div>
 				</div>
-				<div ng-if="vm.leaderboard.length > 0" ng-repeat="score in vm.leaderboard | orderBy : 'wpm'">
+				<div ng-if="vm.leaderboard.length > 0" ng-repeat="score in vm.leaderboard | orderBy : '-wpm'">
 					<div class="col-xs-6">
 						{{ score.name }}
 					</div>
